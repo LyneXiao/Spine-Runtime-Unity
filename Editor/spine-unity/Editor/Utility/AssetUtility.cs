@@ -353,8 +353,8 @@ namespace Spine.Unity.Editor {
 				atlasesForSkeleton = atlasesForSkeleton.Union(newAtlases).ToList();
 				var requiredPaths = GetRequiredAtlasRegions(skeletonPath);
 				atlasesForSkeleton.Sort((a, b) => (
-					string.CompareOrdinal(b.name, skeletonName)
-					- string.CompareOrdinal(a.name, skeletonName)));
+					string.CompareOrdinal(AssetDatabase.GetAssetPath(b), skeletonPath)
+					- string.CompareOrdinal(AssetDatabase.GetAssetPath(a), skeletonPath)));
 				var atlasMatch = GetMatchingAtlas(requiredPaths, atlasesForSkeleton);
 				if (atlasMatch != null || requiredPaths.Count == 0) {
 					IngestSpineProject(loadedAsset, atlasMatch);
