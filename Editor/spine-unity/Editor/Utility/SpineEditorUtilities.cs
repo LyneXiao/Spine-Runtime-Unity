@@ -100,17 +100,21 @@ namespace Spine.Unity.Editor {
 			EditorApplication.delayCall += Initialize; // delayed so that AssetDatabase is ready.
 		}
 
-		static void Initialize () {
-			// Note: Preferences need to be loaded when changing play mode
-			// to initialize handle scale correctly.
-			#if !NEW_PREFERENCES_SETTINGS_PROVIDER
-			Preferences.Load();
-			#else
-			SpinePreferences.Load();
-			#endif
-
-			if (EditorApplication.isPlayingOrWillChangePlaymode) return;
-
+		static void InitEditorPath()
+		{
+			var packageName = "com.esotericsoftware.spine.spine-unity";
+			var packagePath = Path.GetFullPath($"Packages/{packageName}");
+			if (Directory.Exists(packagePath))
+			{
+				var path = Path.GetFullPath(Path.Combine(packagePath, "Editor", "spine-unity", "Editor")).Replace("\\", "/");
+				var projectPath = Path.GetFullPath(".").Replace("\\", "/");
+				path = path.Replace(projectPath, ".");
+				editorPath = path + "/Utility";
+				editorGUIPath = path + "/GUI";
+				return;
+			}
+				
+			
 			string[] assets = AssetDatabase.FindAssets("t:script SpineEditorUtilities");
 			string assetPath = AssetDatabase.GUIDToAssetPath(assets[0]);
 			editorPath = Path.GetDirectoryName(assetPath).Replace('\\', '/');
@@ -123,6 +127,20 @@ namespace Spine.Unity.Editor {
 			else {
 				editorGUIPath = editorPath.Replace("/Utility", "/GUI");
 			}
+		}
+
+		static void Initialize () {
+			// Note: Preferences need to be loaded when changing play mode
+			// to initialize handle scale correctly.
+			#if !NEW_PREFERENCES_SETTINGS_PROVIDER
+			Preferences.Load();
+			#else
+			SpinePreferences.Load();
+			#endif
+
+			if (EditorApplication.isPlayingOrWillChangePlaymode) return;
+			InitEditorPath();
+
 			Icons.Initialize();
 
 			// Drag and Drop
